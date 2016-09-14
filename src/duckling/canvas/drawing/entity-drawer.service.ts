@@ -1,9 +1,13 @@
 import {Component, Injectable} from '@angular/core';
-import {Container, DisplayObject} from 'pixi.js';
+import {Container, DisplayObject,Graphics} from 'pixi.js';
 
 import {BaseAttributeService} from '../../entitysystem/base-attribute-service';
 import {AssetService, RequiredAssetService} from '../../project';
 import {Entity, EntitySystem, Attribute, AttributeKey} from '../../entitysystem/entity';
+import {SelectionService} from '../../selection';
+import {Box2} from '../../math';
+import {drawRectangle, drawX} from '../../canvas/drawing/util';
+import {EntityBoxService} from '../../entitysystem/services';
 
 import {RenderPriorityService} from './render-priority.service';
 import {DrawnConstruct} from './drawn-construct';
@@ -21,7 +25,9 @@ export type AttributeDrawer = (entity : Entity, assetService? : any) => DrawnCon
 export class EntityDrawerService extends BaseAttributeService<AttributeDrawer> {
     constructor(private _assets : AssetService,
                 private _requiredAssets : RequiredAssetService,
-                private _renderPriority : RenderPriorityService) {
+                private _renderPriority : RenderPriorityService,
+                private _selectionService : SelectionService,
+                private _entityBoxService : EntityBoxService) {
         super();
     }
 
@@ -63,7 +69,20 @@ export class EntityDrawerService extends BaseAttributeService<AttributeDrawer> {
                 drawnConstructs.push(drawableConstruct);
             }
         }
+        // draw bounding box if entity is the selected one
+        if (this._selectionService.selection.value.entity === entity) {
+            let drawableSelectionBox = this.drawSelectionBox(this._entityBoxService.getEntityBox(entity));
+            drawnConstructs.push(drawableSelectionBox);
+        }
         return drawnConstructs;
+    }
+
+
+    private drawSelectionBox(box: Box2) {
+        let graphics = new Graphics();
+        graphics.lineStyle(1, 0x8813aa, 1);
+        drawRectangle(box.position, box.dimension, graphics);
+        return graphics;
     }
 
     /**

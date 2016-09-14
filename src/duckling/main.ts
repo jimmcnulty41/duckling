@@ -45,6 +45,7 @@ remote.getCurrentWindow().removeAllListeners();
 
 let storeService = new StoreService(mainReducer, mergeEntityAction);
 let entitySystemService = new EntitySystemService(storeService);
+let selectionService = new SelectionService(storeService, entitySystemService);
 let assetService = new AssetService(storeService);
 let requiredAssetService = new RequiredAssetService();
 
@@ -54,8 +55,9 @@ let electronWindowService = new ElectronWindowService();
 // Bootstrap game specific behavior
 let attributeComponentService = new AttributeComponentService();
 let anconaSFMLRenderPriorityService = new AnconaSFMLRenderPriorityService();
-let entityDrawerService = new EntityDrawerService(assetService, requiredAssetService, anconaSFMLRenderPriorityService);
 let entityBoxService = new EntityBoxService(assetService);
+
+let entityDrawerService = new EntityDrawerService(assetService, requiredAssetService, anconaSFMLRenderPriorityService, selectionService, entityBoxService);
 let attributeDefaultService = new AttributeDefaultService();
 let entityPositionSetService = new EntityPositionSetService(entitySystemService);
 
@@ -101,6 +103,7 @@ function provideClass(implementationClass : Type, base : Type) {
         provideInstance(entitySystemService, EntitySystemService),
         provideInstance(electronWindowService, WindowService),
         provideInstance(anconaSFMLRenderPriorityService, RenderPriorityService),
+        provideInstance(selectionService, SelectionService),
         provideClass(ElectronDialogService, DialogService),
         EntitySelectionService,
         JsonLoaderService,
@@ -108,7 +111,6 @@ function provideClass(implementationClass : Type, base : Type) {
         ProjectSerializerService,
         ProjectService,
         MapParserService,
-        SelectionService,
         CopyPasteService,
         AvailableAttributeService,
     ],
